@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
 
 def apply_rolling(stock, trail_size, predict_length):
     x = []
@@ -32,3 +33,13 @@ def evaluate_model_rmse(y_preds, y_true, num_features, scaler):
     true_dollars = scaler.inverse_transform(res2)[:, 0]
     return np.sqrt(mean_squared_error(true_dollars, pred_dollars))
 
+
+def plot_loss(history):
+    plt.figure(figsize=(8,6))
+    plt.plot(history.history['loss'], 'bo--')
+    plt.plot(history.history['val_loss'], 'ro-')
+    plt.ylabel('Loss')
+    plt.xlabel('Epochs (n)')
+    plt.legend(['Training loss', 'Validation loss'])
+    plt.title("Loss curve for LSTM")
+    plt.show()
