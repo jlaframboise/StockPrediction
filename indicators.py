@@ -29,7 +29,8 @@ def compute_sma(series, trail_size=20):
 def compute_sd(series, trail_size=20):
     """A function to take in a dataframe for one stock time series, 
     and return a pandas series for the standard deviation. """
-    return series['Close'].rolling(window=trail_size, min_periods=1).std()
+    res = series['Close'].rolling(window=trail_size, min_periods=1).std()
+    return res.replace(0, 0.1)
 
 
 def compute_willr(series):
