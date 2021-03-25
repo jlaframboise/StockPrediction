@@ -6,22 +6,26 @@ import matplotlib.pyplot as plt
 def apply_rolling(stock, trail_size, predict_length):
     x = []
     y = []
+    tickers = []
     for i in range(trail_size, len(stock) + 1 - predict_length):
         x_point = stock.drop(columns=['Date', 'Ticker']).iloc[i-trail_size : i].values
         y_point = stock['Close'].iloc[i + predict_length -1]
+        ticker = stock['Ticker'].iloc[i + predict_length -1]
         
         if np.isnan(x_point).sum() ==0:
             x.append(x_point)
             y.append(y_point)
+            tickers.append(ticker)
     
-    return np.array(x), np.array(y)
+    return np.array(x), np.array(y), np.array(tickers)
 
 
 def roll_all_stocks(dataset, trail_size, predict_length):
     res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length))
     x = [x[0] for x in res.values]
     y = [x[1] for x in res.values]
-    return np.concatenate(x), np.concatenate(y)
+    tickers = [x[2] for x in res.values]
+    return np.concatenate(x), np.concatenate(y), np.concatenate(tickers)
 
 
 def evaluate_model_rmse(y_preds, y_true, num_features, scaler):
@@ -43,3 +47,32 @@ def plot_loss(history):
     plt.legend(['Training loss', 'Validation loss'])
     plt.title("Loss curve for LSTM")
     plt.show()
+
+
+def norm_per_stock_split(train, valid, test, features, scaler_model):
+    """
+    Takes in dataframes for train, validation, test 
+    with a 'Ticker' column, and will split
+    the dataframes by this ticker, then fit_transform the data in train
+    with a normalizing model specified in place,
+    and transform the data in train and test in place
+    and return the mapping of tickers to scaler models. 
+    """
+    
+    scalers = {}
+
+    for ticker in train['Ticker'].unique():
+        scaler = scaler_model()
+        
+        # fit and transform training data
+        train.loc[train['Ticker']==ticker, features] = scaler.fit_transform(train.loc[train['Ticker']==ticker, features])
+        
+        # only transform training and test, do not fit. 
+        valid.loc[valid['Ticker']==ticker, features] = scaler.transform(valid.loc[valid['Ticker']==ticker, features])
+        test.loc[test['Ticker']==ticker, features] = scaler.transform(test.loc[test['Ticker']==ticker, features])
+        
+        # save the model that was used for this stock
+        scalers[ticker] = scaler
+        
+    return scalers
+
