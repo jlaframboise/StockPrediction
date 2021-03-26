@@ -19,6 +19,35 @@ def apply_rolling(stock, trail_size, predict_length):
     
     return np.array(x), np.array(y), np.array(tickers)
 
+def split_and_apply_rolling(stock, trail_size, predict_length, hist_features, tech_features):
+    xh = []
+    xt = []
+    y = []
+    tickers = []
+    for i in range(trail_size, len(stock) + 1 - predict_length):
+        # historical data from t-trail_size to t-1 inclusive
+        xh_point = stock.drop(columns=['Date', 'Ticker']+tech_features).iloc[i-trail_size : i].values
+        # technical data at time t-1
+        xt_point = stock[tech_features].iloc[i - 1]
+        # label at time t-1 + predict_length
+        y_point = stock['Close'].iloc[i + predict_length -1]
+        ticker = stock['Ticker'].iloc[i + predict_length -1]
+        
+        if np.isnan(xh_point).sum() ==0 and np.isnan(xt_point).sum() ==0:
+            xh.append(xh_point)
+            xt.append(xt_point)
+            y.append(y_point)
+            tickers.append(ticker)
+    
+    return np.array(xh), np.array(xt), np.array(y), np.array(tickers)
+
+def split_and_roll_all_stocks(dataset, trail_size, predict_length, hist_features, tech_features):
+    res = dataset.groupby('Ticker').apply(lambda x: split_and_apply_rolling(x, trail_size=trail_size, predict_length=predict_length, hist_features=hist_features, tech_features=tech_features))
+    xh = [x[0] for x in res.values]
+    xt = [x[1] for x in res.values]
+    y = [x[2] for x in res.values]
+    tickers = [x[3] for x in res.values]
+    return np.concatenate(xh), np.concatenate(xt), np.concatenate(y), np.concatenate(tickers)
 
 def roll_all_stocks(dataset, trail_size, predict_length):
     res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length))
