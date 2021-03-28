@@ -105,3 +105,24 @@ def norm_per_stock_split(train, valid, test, features, scaler_model):
         
     return scalers
 
+
+def load_climate_data(filenames, terms):
+    """
+    A function to load in the climate google trends data
+    from a list of filenames and a list of corresponding
+    terms. 
+    """
+    # read files
+    dfs = [pd.read_csv(f) for f in filenames]
+    # rename columns, insert the search term string
+    for i in range(len(dfs)):
+        dfs[i].columns = ["Date", "Popularity"]
+        dfs[i].insert(2, "Term", terms[i])
+    # combine to one df
+    climate_trends_data = pd.concat(dfs).reset_index(drop=True)
+    # convert date col to datetime
+    climate_trends_data['Date'] = pd.to_datetime(climate_trends_data['Date'])
+    # convert the data from long to wide format
+    climate_trends_data = climate_trends_data.pivot(index='Date', columns="Term", values="Popularity").reset_index()
+    
+    return climate_trends_data
