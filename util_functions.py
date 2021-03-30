@@ -3,13 +3,16 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
-def apply_rolling(stock, trail_size, predict_length):
+def apply_rolling(stock, trail_size, predict_length, predict_change=False):
     x = []
     y = []
     tickers = []
     for i in range(trail_size, len(stock) + 1 - predict_length):
         x_point = stock.drop(columns=['Date', 'Ticker']).iloc[i-trail_size : i].values
-        y_point = stock['Close'].iloc[i + predict_length -1]
+        if predict_change:
+            y_point = stock['Close'].iloc[i + predict_length -1] - stock['Close'].iloc[i -1]
+        else:
+            y_point = stock['Close'].iloc[i + predict_length -1]
         ticker = stock['Ticker'].iloc[i + predict_length -1]
         
         if np.isnan(x_point).sum() ==0:
@@ -49,12 +52,15 @@ def split_and_roll_all_stocks(dataset, trail_size, predict_length, hist_features
     tickers = [x[3] for x in res.values]
     return np.concatenate(xh), np.concatenate(xt), np.concatenate(y), np.concatenate(tickers)
 
-def roll_all_stocks(dataset, trail_size, predict_length):
-    res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length))
+def roll_all_stocks(dataset, trail_size, predict_length, predict_change=False):
+    res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length, predict_change=predict_change))
     x = [x[0] for x in res.values]
     y = [x[1] for x in res.values]
     tickers = [x[2] for x in res.values]
-    return np.concatenate(x), np.concatenate(y), np.concatenate(tickers)
+    x = np.concatenate(x)
+    y = np.concatenate(y)
+    tickers = np.concatenate(tickers)
+    return x, y, tickers
 
 
 def evaluate_model_rmse(y_preds, y_true, num_features, scaler):
