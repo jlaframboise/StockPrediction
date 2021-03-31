@@ -3,13 +3,15 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
-def apply_rolling(stock, trail_size, predict_length, predict_change=False):
+def apply_rolling(stock, trail_size, predict_length, predict_change=False, trend_classify=False):
     x = []
     y = []
     tickers = []
     for i in range(trail_size, len(stock) + 1 - predict_length):
         x_point = stock.drop(columns=['Date', 'Ticker']).iloc[i-trail_size : i].values
-        if predict_change:
+        if trend_classify:
+            y_point = 1 if stock['Close'].iloc[i + predict_length -1] > stock['Close'].iloc[i -1] else 0
+        elif predict_change:
             y_point = stock['Close'].iloc[i + predict_length -1] - stock['Close'].iloc[i -1]
         else:
             y_point = stock['Close'].iloc[i + predict_length -1]
@@ -52,8 +54,8 @@ def split_and_roll_all_stocks(dataset, trail_size, predict_length, hist_features
     tickers = [x[3] for x in res.values]
     return np.concatenate(xh), np.concatenate(xt), np.concatenate(y), np.concatenate(tickers)
 
-def roll_all_stocks(dataset, trail_size, predict_length, predict_change=False):
-    res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length, predict_change=predict_change))
+def roll_all_stocks(dataset, trail_size, predict_length, predict_change=False, trend_classify=False):
+    res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length, predict_change=predict_change, trend_classify=trend_classify))
     x = [x[0] for x in res.values]
     y = [x[1] for x in res.values]
     tickers = [x[2] for x in res.values]
@@ -61,6 +63,9 @@ def roll_all_stocks(dataset, trail_size, predict_length, predict_change=False):
     y = np.concatenate(y)
     tickers = np.concatenate(tickers)
     return x, y, tickers
+
+
+
 
 
 def evaluate_model_rmse(y_preds, y_true, num_features, scaler):
@@ -81,6 +86,16 @@ def plot_loss(history):
     plt.xlabel('Epochs (n)')
     plt.legend(['Training loss', 'Validation loss'])
     plt.title("Loss curve for LSTM")
+    plt.show()
+
+def plot_acc(history):
+    plt.figure(figsize=(8,6))
+    plt.plot(history.history['accuracy'], 'bo--')
+    plt.plot(history.history['val_accuracy'], 'ro-')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epochs (n)')
+    plt.legend(['Training accuracy', 'Validation accuracy'])
+    plt.title("Accuracy curve for LSTM")
     plt.show()
 
 
@@ -132,3 +147,10 @@ def load_climate_data(filenames, terms):
     climate_trends_data = climate_trends_data.pivot(index='Date', columns="Term", values="Popularity").reset_index()
     
     return climate_trends_data
+
+def performance_stats(model, x, y):
+    print("Upward ratio: {}".format(np.mean(y)))
+    preds = model.predict(x)
+    print("Mean prediction: {}".format(np.mean(preds)))
+    print("Predicted upward ratio: {}".format(np.mean(preds>0.5)))
+    print("Accuracy: {}".format(np.mean( y == [1 if x>0.5 else 0 for x in preds])))
