@@ -5,11 +5,23 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
 def apply_rolling(stock, trail_size, predict_length, predict_change=False, trend_classify=False):
+    """
+    A function that takes in a timeseries for a single stock,
+    and reshapes the data for input into an LSTM. 
+
+    It converts (days, features) to (days, trail_size days, features). 
+    It will set the yvalue based on the setting parameters, and predict_length. 
+    """
     x = []
     y = []
     tickers = []
+
+    # for every day
     for i in range(trail_size, len(stock) + 1 - predict_length):
+        # x is features for last trail_size days
         x_point = stock.drop(columns=['Date', 'Ticker']).iloc[i-trail_size : i].values
+        
+        # set y value based on settings
         if trend_classify:
             y_point = 1 if stock['Close'].iloc[i + predict_length -1] > stock['Close'].iloc[i -1] else 0
         elif predict_change:
@@ -18,18 +30,29 @@ def apply_rolling(stock, trail_size, predict_length, predict_change=False, trend
             y_point = stock['Close'].iloc[i + predict_length -1]
         ticker = stock['Ticker'].iloc[i + predict_length -1]
         
+        # only append datapoints where there is no nan values
         if np.isnan(x_point).sum() ==0:
             x.append(x_point)
             y.append(y_point)
             tickers.append(ticker)
     
+    # return the x values, the y values, 
+    # and the ticker repeated for every point
     return np.array(x), np.array(y), np.array(tickers)
 
 def split_and_apply_rolling(stock, trail_size, predict_length, hist_features, tech_features):
+    """
+    A function that will perform the same task as apply_rolling, 
+    except it will split the technical indicators into a separate input
+    from the historical data for use in a model with separate input branches. 
+
+    """
     xh = []
     xt = []
     y = []
     tickers = []
+
+    # for every day
     for i in range(trail_size, len(stock) + 1 - predict_length):
         # historical data from t-trail_size to t-1 inclusive
         xh_point = stock.drop(columns=['Date', 'Ticker']+tech_features).iloc[i-trail_size : i].values
@@ -39,15 +62,23 @@ def split_and_apply_rolling(stock, trail_size, predict_length, hist_features, te
         y_point = stock['Close'].iloc[i + predict_length -1]
         ticker = stock['Ticker'].iloc[i + predict_length -1]
         
+        # check for nan values
         if np.isnan(xh_point).sum() ==0 and np.isnan(xt_point).sum() ==0:
             xh.append(xh_point)
             xt.append(xt_point)
             y.append(y_point)
             tickers.append(ticker)
     
+    # return inputs, outputs, and the ticker
     return np.array(xh), np.array(xt), np.array(y), np.array(tickers)
 
 def split_and_roll_all_stocks(dataset, trail_size, predict_length, hist_features, tech_features):
+    """
+    A function that will take in a dataset of many stocks, 
+    and apply the split_and_apply_rolling function to 
+    split each stock into inputs, outputs reshaped for input to LSTM, 
+    and will return the concatenation. 
+    """
     res = dataset.groupby('Ticker').apply(lambda x: split_and_apply_rolling(x, trail_size=trail_size, predict_length=predict_length, hist_features=hist_features, tech_features=tech_features))
     xh = [x[0] for x in res.values]
     xt = [x[1] for x in res.values]
@@ -56,6 +87,13 @@ def split_and_roll_all_stocks(dataset, trail_size, predict_length, hist_features
     return np.concatenate(xh), np.concatenate(xt), np.concatenate(y), np.concatenate(tickers)
 
 def roll_all_stocks(dataset, trail_size, predict_length, predict_change=False, trend_classify=False):
+    """
+    A function that takes in a dataset of stocks, 
+    and for each stock it will apply_rolling to
+    reshape it into inputs and outputs for LSTM. 
+
+    It then concatenates the output and returns. 
+    """
     res = dataset.groupby('Ticker').apply(lambda x: apply_rolling(x, trail_size=trail_size, predict_length=predict_length, predict_change=predict_change, trend_classify=trend_classify))
     x = [x[0] for x in res.values]
     y = [x[1] for x in res.values]
@@ -70,6 +108,12 @@ def roll_all_stocks(dataset, trail_size, predict_length, predict_change=False, t
 
 
 def evaluate_model_rmse(y_preds, y_true, num_features, scaler):
+    """
+    When performing regression, our model is trained on normalized 
+    features (including predicted prices) and so before computing
+    RMSE we need to take the sklearn scaler we used to normalize
+    and inverse the transform so we can consider RMSE in dollars. 
+    """
     dummies = np.zeros((y_preds.shape[0], num_features-1))
     res = np.concatenate([y_preds, dummies], axis=1)
     pred_dollars = scaler.inverse_transform(res)[:, 0]
@@ -80,6 +124,10 @@ def evaluate_model_rmse(y_preds, y_true, num_features, scaler):
 
 
 def plot_loss(history):
+    """
+    A helper function to make a plot of the loss curve of 
+    a network trained with Keras. Style from Jacob's past work. 
+    """
     plt.figure(figsize=(8,6))
     plt.plot(history.history['loss'], 'bo--')
     plt.plot(history.history['val_loss'], 'ro-')
@@ -90,6 +138,10 @@ def plot_loss(history):
     plt.show()
 
 def plot_acc(history):
+    """
+    A helper function to make a plot of the loss curve of 
+    a network trained with Keras. Style from Jacob's past work. 
+    """
     plt.figure(figsize=(8,6))
     plt.plot(history.history['accuracy'], 'bo--')
     plt.plot(history.history['val_accuracy'], 'ro-')
@@ -150,6 +202,13 @@ def load_climate_data(filenames, terms):
     return climate_trends_data
 
 def performance_stats(model, x, y):
+    """
+    A function that will take in a LSTM model, and 
+    inputs and output and will print some key stats 
+    that can indicate performance, but also whether the model is
+    guessing only one class all the time to get that baseline 50%
+    accuracy. 
+    """
     print("Upward ratio: {:.2%}".format(np.mean(y)))
     preds = model.predict(x)
     print("Mean prediction: {:.2%}".format(np.mean(preds)))
