@@ -1,0 +1,350 @@
+﻿Features:
+All Features
+Format: Feature - Number of occurrences with correlation <= -0.1 or >= 0.1
+Top_energy (Peason & climate adjusted) list:Done
+* electric vehicles - 5
+* fossil fuels - 1
+* Close - 7
+* High - 6
+* Low - 6
+* Open - 6
+* HH - 6
+* LL - 6
+* SMA -6
+* SD -1
+* ATR - 1
+* DMH - 1
+* DML - 1
+* EMA - 6
+* WMA - 7
+* BBHIGH -6
+* BBLOW -7
+* PERBHIGH -1
+* PERBLOW -1
+* TRIMA - 7
+* RSI -6
+* NDI -1
+* ADX -1
+* ROC - 4
+* MACD - 4
+* CCI - 3
+
+
+Top_energy (Spearman & climate adjusted) list: Done
+* climate change - 2
+* Greenhouse gas - 1
+* Oil - 3
+* renewable -1
+* Carbon tax -2
+* Electric vehicles -1
+* Fossil field -2
+* Close - 6
+* High -6
+* Low - 6
+* Open - 6
+* HH - 6
+* LL - 6
+* SMA - 6
+* SD - 1
+* ATR - 3
+* DMH - 1
+* DML - 1
+* EMA - 6
+* WMA - 6
+* BBHIGH - 4
+* BBLOW - 6
+* TRIMA - 5
+* RSI - 4
+* PDI - 1
+* ADX - 1
+* ROC - 3
+* MACD - 3
+* CCI - 1
+
+
+Top_energy (Kendall & climate adjusted) list: Done
+* greenhouse gas - 1
+* Oil -1
+* Carbon tax - 1
+* Electric vehicles - 1
+* Close - 5
+* High - 5
+* Low - 5
+* Open - 5
+* HH - 2
+* LL - 3
+* SMA - 3
+* EMA - 3
+* WMA - 3
+* BBHIGH - 2
+* BBLOW - 2
+* TRIMA  - 2
+* RSI - 2
+* ADX - 1
+* ROC - 2
+Traditional_energy (pearson & climate adjusted) list: Done
+* greenhouse gas- 1
+* Oil - 4
+* Carbon tax - 1
+* Electric vehicles - 9
+* Close - 10
+* High - 10
+* Low - 11
+* Open - 10
+* Volume - 2
+* HH - 10
+* LL - 10
+* AV - 2
+* SMA - 9
+* SD - 3
+* ATR - 1
+* EMA - 9
+* WMA - 9
+* BBHIGH - 9
+* BBLOW - 9
+* PERBHIGH - 4
+* PERBLOW - 4
+* TRIMA - 9
+* DX - 1
+* ADX - 2
+* ROC - 2
+* MACD - 1
+* CCI - 1
+Traditional_energy (spearman & climate adjusted) list: Done
+* climate change - 1
+* Greenhouse gas - 4
+* Oil - 6
+* Renewable - 1
+* Electric vehicles - 2
+* Close - 11
+* High - 11
+* Low - 11
+* Volume - 4
+* Open - 11
+* HH - 11
+* LL - 11
+* AV - 5
+* SMA - 11
+* SD - 2
+* ATR - 3
+* DMH - 1
+* DML - 1
+* EMA - 11
+* WMA - 11
+* BBHIGH - 10
+* BBLOW - 11
+* PERBHIGH - 4
+* PERBLOW - 4
+* TRIMA - 10
+* RSI - 2
+* PDI  - 1
+* ADX - 2
+* ROC - 1
+* MACD - 1
+* CCI - 1
+Traditional_energy (Kendall & climate adjusted) list: Done
+* electric vehicles - 1
+* Close - 6
+* High - 6
+* Low - 6
+* Open - 6
+* HH - 7
+* LL - 6
+* SMA - 6
+* WILLR - 1
+* EMA - 6
+* WMA - 6
+* BBHIGH - 5
+* BBLOW - 6
+* PERBHIGH - 1
+* PERBLOW - 1
+* TRIMA - 7
+* RSI - 1
+* ADX - 2
+* ROC - 1
+* MACD - 1
+* CCI - 1
+Technology (Pearson):
+* DMH
+* DML
+* CCI
+* RSI
+* PDI
+* NDI
+* MACD
+* SD
+* ATR
+* BHIGH
+* Target
+* TRIMA
+* WMA
+
+
+Technology(Spearman):
+* CCI
+* RSI
+* ROC
+* DMH
+* DML
+* NDI
+* Volume
+* PERBLOW
+* PERBHGH
+* AV
+* DX
+* ADX
+
+
+Technology(kendall):
+* CCI
+* RSI
+* ROC
+* DMH
+* DML
+* VOlume
+* PERBLOW
+* PERBHIGH
+* AV
+* DX
+* ADX
+* Target
+
+
+Technology(mean):
+* CCI
+* RSI
+* DMH
+* DML
+* ROC
+* SD
+* Volume
+* ATR
+* AV
+* PERBLOW
+* PERBHIGH
+* DX
+
+
+Technology(Univariate):
+* EMA
+* ADX
+* MACD
+* BBHIGH
+* TRIMA
+* RSI
+* PERBHIGH
+* PERBLOW
+* VOLUME
+* HH
+* ROC
+* High
+
+
+Top Energy (Pearson):
+* Close
+* High
+* Low
+* Open
+* Target
+* DX
+* TRIMA
+* BBLOW
+
+
+Top Energy (Spearman):
+* Close
+* High
+* Low
+* Open
+* Target
+* DX
+* TRIMA
+* BBLOW
+
+
+Top Energy (kendall):
+* Close
+* High
+* Low
+* Open
+* Target
+* DX
+* TRIMA
+* BBLOW
+
+
+Top Energy (mean):
+* Close
+* High
+* Low
+* Open
+* Target
+* DX
+* TRIMA
+* BBLOW
+
+
+Top Energy (Univariate):
+* Close
+* High
+* Low
+* Open
+* Target
+* DX
+* TRIMA
+* BBLOW
+
+
+Trad Energy (Pearson):
+* Close
+* Low
+* High
+* Open
+* Volume
+* WMA
+* TRIMA
+* Target
+
+
+Trad Energy (Spearman):
+* Close
+* Low
+* High
+* Open
+* Volume
+* WMA
+* TRIMA
+* Target
+
+
+Trad Energy (kendall):
+* Close
+* Low
+* High
+* Open
+* Volume
+* WMA
+* TRIMA
+* Target
+
+
+Trad Energy (mean):
+* Close
+* Low
+* High
+* Open
+* Volume
+* WMA
+* TRIMA
+* Target
+
+
+Trad Energy (Univariate):
+* Volume
+* AV
+* TRIMA
+* WMA
+* DX
+* BBHIGH
+* HH
+* High
